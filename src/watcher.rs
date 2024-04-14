@@ -8,7 +8,7 @@ use std::{
 };
 
 use crate::{
-    config::{ACTIVITY_CHECK_INTERNVAL_MS, MAX_IDLE_SECONDS, SAVE_INTERVAL_MS},
+    config::{ACTIVITY_SAMPLING_RATE_MS, MAX_IDLE_SECONDS, SAVE_INTERVAL_MS},
     utils::logger::{log_msg, LogLevel},
 };
 
@@ -50,7 +50,7 @@ impl<'a> ScreenTimeWatcher<'a> {
                 exit(1);
             });
 
-        let time_to_wait = Duration::from_millis(ACTIVITY_CHECK_INTERNVAL_MS.into());
+        let time_to_wait = Duration::from_millis(ACTIVITY_SAMPLING_RATE_MS.into());
         let mut total_passed = Duration::default();
 
         loop {
