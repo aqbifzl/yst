@@ -1,5 +1,5 @@
 use std::{
-    error::Error,
+    error::{self, Error},
     sync::{Arc, Mutex},
     thread::{sleep, spawn},
     time::Duration,
@@ -19,31 +19,39 @@ use x11rb::{
     rust_connection::RustConnection,
 };
 
+use crate::utils::logger::{log_msg, LogLevel};
+
 pub struct IdleWatcher {
     pub idle_time: Arc<Mutex<Duration>>,
     connection: Arc<Mutex<RustConnection>>,
 }
 
 impl IdleWatcher {
-    pub fn new(duration: Arc<Mutex<Duration>>) -> Self {
-        let (connection, screen_num) = connect(None).unwrap();
+    pub fn new(duration: Arc<Mutex<Duration>>) -> Result<Self, Box<dyn error::Error>> {
+        let (connection, screen_num) = connect(None)?;
 
         let screen = &connection.setup().roots[screen_num];
-        Self::select_xi_events(&connection, screen.root).unwrap();
+        Self::select_xi_events(&connection, screen.root)?;
 
-        Self {
+        Ok(Self {
             connection: Arc::new(Mutex::new(connection)),
             idle_time: duration.clone(),
-        }
+        })
     }
     pub fn run(&self) {
-        // dbg!("running");
+        log_msg("Running loop monitoring inactivity", LogLevel::Debug);
         let zero_it = self.idle_time.clone();
         let zero_conn = self.connection.clone();
         let zero_th = spawn(move || loop {
-            // dbg!("watiing for event");
             let ev = zero_conn.lock().unwrap().wait_for_event();
-            match ev.unwrap() {
+            let ev = match ev {
+                Ok(ev) => ev,
+                Err(ev_err) => {
+                    log_msg(&format!("{}", ev_err), LogLevel::Error);
+                    continue;
+                }
+            };
+            match ev {
                 XinputRawKeyPress(_)
                 | XinputRawKeyRelease(_)
                 | XinputRawButtonPress(_)

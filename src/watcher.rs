@@ -1,12 +1,16 @@
 use std::{
     error::Error,
+    process::exit,
     rc::Rc,
     sync::{Arc, Mutex},
     thread::sleep,
     time::Duration,
 };
 
-use crate::config::{ACTIVITY_CHECK_INTERNVAL_MS, MAX_IDLE_SECONDS, SAVE_INTERVAL_MS};
+use crate::{
+    config::{ACTIVITY_CHECK_INTERNVAL_MS, MAX_IDLE_SECONDS, SAVE_INTERVAL_MS},
+    utils::logger::{log_msg, LogLevel},
+};
 
 use self::{
     active_win::{ActiveWin, ActiveWinTracker},
@@ -37,7 +41,15 @@ impl<'a> ScreenTimeWatcher<'a> {
         })
     }
     pub fn run(&mut self) {
-        self.storage.lock().unwrap().load_from_file().unwrap();
+        self.storage
+            .lock()
+            .unwrap()
+            .load_from_file()
+            .unwrap_or_else(|_| {
+                log_msg("Couldn't load data from file", LogLevel::Error);
+                exit(1);
+            });
+
         let time_to_wait = Duration::from_millis(ACTIVITY_CHECK_INTERNVAL_MS.into());
         let mut total_passed = Duration::default();
 

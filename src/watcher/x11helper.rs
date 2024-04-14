@@ -1,9 +1,14 @@
-use std::sync::{Arc, Mutex};
+use std::{
+    error,
+    sync::{Arc, Mutex},
+};
 
 use x11rb::{
     protocol::xproto::{Atom, AtomEnum, ConnectionExt},
     rust_connection::RustConnection,
 };
+
+use crate::utils::logger::{log_msg, LogLevel};
 
 pub struct X11Atoms {
     pub _net_active_window: Atom,
@@ -12,24 +17,23 @@ pub struct X11Atoms {
 }
 
 impl X11Atoms {
-    pub fn new(connection: Arc<Mutex<RustConnection>>) -> X11Atoms {
+    pub fn new(connection: Arc<Mutex<RustConnection>>) -> Result<Self, Box<dyn error::Error>> {
         let connection = connection.lock().unwrap();
 
-        X11Atoms {
-            _net_active_window: Self::get_atom(&connection, "_NET_ACTIVE_WINDOW").unwrap(),
-            _net_wm_pid: Self::get_atom(&connection, "_NET_WM_PID").unwrap(),
-            _net_wm_name: Self::get_atom(&connection, "_NET_WM_NAME").unwrap(),
-        }
+        Ok(X11Atoms {
+            _net_active_window: Self::get_atom(&connection, "_NET_ACTIVE_WINDOW")?,
+            _net_wm_pid: Self::get_atom(&connection, "_NET_WM_PID")?,
+            _net_wm_name: Self::get_atom(&connection, "_NET_WM_NAME")?,
+        })
     }
-    pub fn get_atom(connection: &RustConnection, name: &str) -> Option<Atom> {
-        Some(
-            connection
-                .intern_atom(false, name.as_bytes())
-                .ok()?
-                .reply()
-                .ok()?
-                .atom,
-        )
+    pub fn get_atom(
+        connection: &RustConnection,
+        name: &str,
+    ) -> Result<Atom, Box<dyn error::Error>> {
+        Ok(connection
+            .intern_atom(false, name.as_bytes())?
+            .reply()?
+            .atom)
     }
 }
 
@@ -39,11 +43,13 @@ pub struct X11Helper {
 }
 
 impl X11Helper {
-    pub fn new(connection: Arc<Mutex<RustConnection>>) -> Self {
-        Self {
+    pub fn new(connection: Arc<Mutex<RustConnection>>) -> Result<Self, Box<dyn error::Error>> {
+        let atoms = X11Atoms::new(connection.clone())?;
+
+        Ok(Self {
+            atoms,
             connection: connection.clone(),
-            atoms: X11Atoms::new(connection.clone()),
-        }
+        })
     }
     pub fn get_text_property(
         &self,

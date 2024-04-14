@@ -7,7 +7,10 @@ use std::{
     path::PathBuf,
 };
 
-use crate::{config::STORAGE_PATH, utils::fs::escape_home_dir};
+use crate::{
+    config::STORAGE_PATH,
+    utils::{fs::escape_home_dir, get_current_date},
+};
 
 // use crate::{config::STORAGE_PATH, fs_utils::escape_home_dir};
 
@@ -36,10 +39,6 @@ pub struct Storage {
     pub data: StorageJson,
     current_path: PathBuf,
     storage_dir: PathBuf,
-}
-
-fn get_current_date() -> String {
-    chrono::Local::now().format("%Y-%m-%d").to_string()
 }
 
 pub fn get_todays_filename() -> PathBuf {
