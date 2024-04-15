@@ -8,8 +8,6 @@ use x11rb::{
     rust_connection::RustConnection,
 };
 
-use crate::utils::logger::{log_msg, LogLevel};
-
 pub struct X11Atoms {
     pub _net_active_window: Atom,
     pub _net_wm_pid: Atom,

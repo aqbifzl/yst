@@ -4,9 +4,9 @@ use std::{
 };
 
 use axum::{routing, Router};
+use shared::config::API_HOST;
 
 use crate::{
-    config::API_HOST,
     utils::logger::{log_msg, LogLevel},
     watcher::storage::Storage,
 };

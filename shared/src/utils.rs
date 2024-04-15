@@ -1,4 +1,16 @@
-use std::{env, error::Error, path::PathBuf};
+use std::{error::Error, path::PathBuf};
+
+pub fn get_current_date() -> String {
+    chrono::Local::now().format("%Y-%m-%d").to_string()
+}
+
+pub fn get_current_time() -> String {
+    chrono::Local::now().format("%H:%M:%S").to_string()
+}
+
+pub fn get_current_date_and_time() -> String {
+    get_current_date() + " " + &get_current_time()
+}
 
 pub fn escape_home_dir(str: &str) -> Result<PathBuf, Box<dyn Error>> {
     match str.find('~') {
@@ -21,7 +33,7 @@ pub fn escape_home_dir(str: &str) -> Result<PathBuf, Box<dyn Error>> {
 mod tests {
     use std::path::PathBuf;
 
-    use crate::utils::fs::escape_home_dir;
+    use crate::utils::escape_home_dir;
 
     #[test]
     fn test_escape_home_dir() {

@@ -32,13 +32,7 @@ fn main() {
     let screen = &connection.setup().roots[screen_num];
     let root = screen.root;
     let connection = Arc::new(Mutex::new(connection));
-    let storage = match Storage::new() {
-        Ok(storage) => Arc::new(Mutex::new(storage)),
-        Err(err) => {
-            println!("{}", err);
-            exit(1);
-        }
-    };
+    let storage = Arc::new(Mutex::new(Storage::new()));
     log_msg("Successfully initialized storage", LogLevel::Debug);
 
     let x11_helper = match X11Helper::new(connection.clone()) {

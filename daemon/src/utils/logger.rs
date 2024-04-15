@@ -3,9 +3,10 @@ use std::{
     io::Write,
 };
 
-use crate::config::{LOG_PATH, LOG_SEPARATOR};
-
-use super::{fs::escape_home_dir, get_current_date_and_time};
+use shared::{
+    config::{LOG_PATH, LOG_SEPARATOR},
+    utils::{escape_home_dir, get_current_date_and_time},
+};
 
 pub enum LogLevel {
     Info,

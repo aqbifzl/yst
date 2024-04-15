@@ -1,11 +1,11 @@
 [package]
-name = "client"
+name = "shared"
 version = "0.1.0"
 edition = "2021"
 
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [dependencies]
-ncurses = { version = "6.0.0", features = ["wide"] }
-shared = {path= "../shared/"}
 serde_json = "1.0.115"
 serde = { version = "1.0.197", features = ["derive"] }
-
+chrono = "0.4.37"

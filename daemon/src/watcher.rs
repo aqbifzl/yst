@@ -7,10 +7,9 @@ use std::{
     time::Duration,
 };
 
-use crate::{
-    config::{ACTIVITY_SAMPLING_RATE_MS, MAX_IDLE_SECONDS, SAVE_INTERVAL_MS},
-    utils::logger::{log_msg, LogLevel},
-};
+use shared::config::{ACTIVITY_SAMPLING_RATE_MS, MAX_IDLE_SECONDS, SAVE_INTERVAL_MS};
+
+use crate::utils::logger::{log_msg, LogLevel};
 
 use self::{
     active_win::{ActiveWin, ActiveWinTracker},

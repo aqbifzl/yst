@@ -1,11 +1,14 @@
 use ncurses::{box_, delwin, mvaddstr, newwin, refresh, wrefresh, WINDOW};
 
-use crate::{make_relative, Drawable, Position, Rect, RelativePosition};
+use crate::{
+    position_utils::{make_relative, Position, Rect, RelativePosition},
+    Drawable,
+};
 
 pub struct SimpleBox {
     rect: Rect<i32>,
     win: WINDOW,
-    content: Option<Content>,
+    content: Vec<Content>,
     border: bool,
 }
 
@@ -16,12 +19,10 @@ pub struct Content {
 
 impl Drawable for SimpleBox {
     fn draw(&self) {
-        let content = match &self.content {
-            Some(content) => content,
-            None => return,
-        };
+        for content in &self.content {
+            mvaddstr(content.position.y, content.position.x, &content.str).unwrap();
+        }
 
-        mvaddstr(content.position.y, content.position.y, &content.str).unwrap();
         refresh();
     }
     fn refresh(&self) {
@@ -46,25 +47,17 @@ impl SimpleBox {
         Self {
             rect,
             win,
-            content: None,
+            content: Vec::new(),
             border,
         }
     }
-    pub fn set_content(&mut self, str: String, position: Position) {
+    pub fn add_content(&mut self, str: String, position: Position) {
         let Rect { x, y, w, h } = self.rect;
 
         let border_size = if self.border { 1 } else { 0 };
-        let relative = make_relative(
-            position,
-            Rect {
-                x: x + border_size,
-                y: y + border_size,
-                w: w - border_size,
-                h: h - border_size,
-            },
-        );
+        let relative = make_relative(position, Rect { x, y, w, h }, border_size, str.len() as i32);
 
-        self.content = Some(Content {
+        self.content.push(Content {
             str,
             position: relative,
         });
