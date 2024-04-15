@@ -6,18 +6,15 @@ use std::{
     time::Duration,
 };
 
-use x11rb::{connect, connection::Connection};
-
-#[cfg(feature = "api")]
-use yst::api::run_api;
-
-use yst::{
+use daemon::{
+    api::run_api,
     utils::logger::{init_logger, log, log_msg, LogLevel},
     watcher::{
         active_win::ActiveWinTracker, idle_watcher::IdleWatcher, storage::Storage,
         x11helper::X11Helper, ScreenTimeWatcher,
     },
 };
+use x11rb::{connect, connection::Connection};
 
 fn main() {
     if let Err(err) = init_logger() {
