@@ -13,9 +13,10 @@ pub trait Drawable {
 }
 
 pub trait ContentHolder {
-    fn add_content(&mut self, str: String, position: Position);
-    fn max_length(&self) -> u32;
-    fn max_row(&self) -> u32;
+    fn add_content(&mut self, str: &str, position: &Position);
+    fn clear_content(&mut self);
+    fn max_length(&self) -> usize;
+    fn max_row(&self) -> usize;
 }
 
 pub trait DrawableContentHolder: Drawable + ContentHolder {}

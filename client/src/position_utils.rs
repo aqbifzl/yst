@@ -27,7 +27,7 @@ pub struct RelativePosition {
 }
 
 pub fn make_relative(
-    position: Position,
+    position: &Position,
     rect: Rect<i32>,
     border_size: u8,
     xoffset: i32,

@@ -1,4 +1,6 @@
-use ncurses::{box_, delwin, mvaddstr, newwin, refresh, wrefresh, WINDOW};
+use std::cmp::max;
+
+use ncurses::{box_, delwin, mvaddstr, newwin, refresh, wclear, wrefresh, WINDOW};
 
 use crate::{
     position_utils::{make_relative, Position, Rect, RelativePosition},
@@ -26,6 +28,10 @@ impl Drawable for SimpleBox {
         refresh();
     }
     fn refresh(&self) {
+        wclear(self.win);
+        if self.border {
+            box_(self.win, 0, 0);
+        }
         refresh();
         wrefresh(self.win);
     }
@@ -59,7 +65,11 @@ impl SimpleBox {
 }
 
 impl ContentHolder for SimpleBox {
-    fn add_content(&mut self, str: String, position: Position) {
+    fn clear_content(&mut self) {
+        self.content.clear();
+    }
+    fn add_content(&mut self, str: &str, position: &Position) {
+        let str = str.to_string();
         let Rect { x, y, w, h } = self.rect;
 
         let border_size = if self.border { 1 } else { 0 };
@@ -70,12 +80,12 @@ impl ContentHolder for SimpleBox {
             position: relative,
         });
     }
-    fn max_length(&self) -> u32 {
+    fn max_length(&self) -> usize {
         let border_size = if self.border { 1 } else { 0 };
-        (self.rect.w - (border_size * 2)) as u32
+        max(self.rect.w - (border_size * 2), 0) as usize
     }
-    fn max_row(&self) -> u32 {
+    fn max_row(&self) -> usize {
         let border_size = if self.border { 1 } else { 0 };
-        (self.rect.h - (border_size * 2)) as u32 - 1
+        max(self.rect.h - (border_size * 2) - 1, 0) as usize
     }
 }

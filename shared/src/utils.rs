@@ -1,15 +1,17 @@
 use std::{error::Error, path::PathBuf};
 
-pub fn get_current_date() -> String {
-    chrono::Local::now().format("%Y-%m-%d").to_string()
-}
-
 pub fn get_current_time() -> String {
     chrono::Local::now().format("%H:%M:%S").to_string()
 }
 
+pub fn get_specific_date(offset: i32) -> String {
+    (chrono::Local::now() + chrono::Duration::days(offset.into()))
+        .format("%Y-%m-%d")
+        .to_string()
+}
+
 pub fn get_current_date_and_time() -> String {
-    get_current_date() + " " + &get_current_time()
+    get_specific_date(0) + " " + &get_current_time()
 }
 
 pub fn ms_to_human_readable_time_span(mut ms: u128) -> String {

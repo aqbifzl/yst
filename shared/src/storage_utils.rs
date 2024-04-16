@@ -7,19 +7,26 @@ use std::{
 use crate::{
     config::STORAGE_PATH,
     storage::StorageJson,
-    utils::{escape_home_dir, get_current_date},
+    utils::{escape_home_dir, get_specific_date},
 };
 
-pub fn get_todays_filename() -> PathBuf {
-    PathBuf::from(get_current_date() + ".json")
+pub fn get_filename(offset: i32) -> PathBuf {
+    PathBuf::from(get_specific_date(offset) + ".json")
 }
 
-pub fn get_current_filepath() -> Result<PathBuf, Box<dyn Error>> {
+pub fn get_current_filepath(create: bool) -> Result<PathBuf, Box<dyn Error>> {
+    get_filepath(0, create)
+}
+
+pub fn get_filepath(offset: i32, create: bool) -> Result<PathBuf, Box<dyn Error>> {
     let mut filepath = get_storage_dir()?;
-    filepath.push(get_todays_filename());
+    filepath.push(get_filename(offset));
 
     let md = metadata(&filepath);
     if md.is_err() {
+        if !create {
+            return Err("File not found".into());
+        }
         write(&filepath, serde_json::to_string(&StorageJson::new())?)?;
     }
 

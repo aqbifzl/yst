@@ -34,7 +34,7 @@ impl Storage {
         }
     }
     pub fn load_from_file(&mut self) -> Result<(), Box<dyn Error>> {
-        let filepath = get_current_filepath()?;
+        let filepath = get_current_filepath(true)?;
         let str = read_to_string(&filepath)?;
         let json: StorageJson = serde_json::from_str(&str)?;
 
@@ -44,7 +44,7 @@ impl Storage {
         Ok(())
     }
     pub fn save_to_file(&mut self) -> Result<(), Box<dyn Error>> {
-        let filepath = get_current_filepath()?;
+        let filepath = get_current_filepath(true)?;
         if filepath != self.last_filepath {
             self.data.applications.clear();
             self.data.titles.clear();
