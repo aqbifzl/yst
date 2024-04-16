@@ -5,6 +5,12 @@ pub struct Rect<T> {
     pub h: T,
 }
 
+impl<T> Rect<T> {
+    pub fn new(x: T, y: T, w: T, h: T) -> Self {
+        Self { x, y, w, h }
+    }
+}
+
 pub enum PositionUnit {
     Val(i32),
     Center,

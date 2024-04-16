@@ -1,1 +1,1 @@
-pub const TOP_BAR_SIZE: u8 = 5;
+pub const TOP_BAR_SIZE: i32 = 5;

@@ -12,6 +12,34 @@ pub fn get_current_date_and_time() -> String {
     get_current_date() + " " + &get_current_time()
 }
 
+pub fn ms_to_human_readable_time_span(mut ms: u128) -> String {
+    let h = ms / (1000 * 60 * 60);
+    ms %= 1000 * 60 * 60;
+
+    let m = ms / (1000 * 60);
+    ms %= 1000 * 60;
+
+    let s = ms / 1000;
+
+    let mut res = String::new();
+
+    if h > 0 {
+        res.push_str(&format!("{}h ", h));
+    }
+    if m > 0 {
+        res.push_str(&format!("{}m ", m));
+    }
+    if s > 0 {
+        res.push_str(&format!("{}s ", s));
+    }
+
+    if res.is_empty() {
+        res = "<0ms".to_string()
+    }
+
+    res
+}
+
 pub fn escape_home_dir(str: &str) -> Result<PathBuf, Box<dyn Error>> {
     match str.find('~') {
         Some(index) => {

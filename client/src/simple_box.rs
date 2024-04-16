@@ -2,7 +2,7 @@ use ncurses::{box_, delwin, mvaddstr, newwin, refresh, wrefresh, WINDOW};
 
 use crate::{
     position_utils::{make_relative, Position, Rect, RelativePosition},
-    Drawable,
+    ContentHolder, Drawable, DrawableContentHolder,
 };
 
 pub struct SimpleBox {
@@ -34,6 +34,8 @@ impl Drawable for SimpleBox {
     }
 }
 
+impl DrawableContentHolder for SimpleBox {}
+
 impl SimpleBox {
     pub fn new(rect: Rect<i32>, border: bool) -> Self {
         assert!(rect.w > 1 && rect.h > 1);
@@ -51,7 +53,13 @@ impl SimpleBox {
             border,
         }
     }
-    pub fn add_content(&mut self, str: String, position: Position) {
+    pub fn new_with_borders(rect: Rect<i32>) -> Self {
+        Self::new(rect, true)
+    }
+}
+
+impl ContentHolder for SimpleBox {
+    fn add_content(&mut self, str: String, position: Position) {
         let Rect { x, y, w, h } = self.rect;
 
         let border_size = if self.border { 1 } else { 0 };
@@ -61,5 +69,13 @@ impl SimpleBox {
             str,
             position: relative,
         });
+    }
+    fn max_length(&self) -> u32 {
+        let border_size = if self.border { 1 } else { 0 };
+        (self.rect.w - (border_size * 2)) as u32
+    }
+    fn max_row(&self) -> u32 {
+        let border_size = if self.border { 1 } else { 0 };
+        (self.rect.h - (border_size * 2)) as u32 - 1
     }
 }
