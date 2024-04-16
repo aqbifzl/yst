@@ -3,9 +3,16 @@ Currently in development, project aims to create simple linux activity tracker f
 
 It also builds the API by default, if you don't want it, you can't just remove it from features in Cargo.toml
 
-TODO:
--cli client
--web client
--wayland support
--add logs
--add unit tests
+### Todo
+
+- [ ] Web client
+- [ ] Wayland support
+      
+### In Progress
+
+- [ ] Add unit tests
+
+### Done ✓
+
+- [x] Add logs
+- [x] Cli client
