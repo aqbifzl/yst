@@ -9,20 +9,6 @@ pub struct ActiveWinProperties {
     pub cmd: String,
 }
 
-impl ActiveWinProperties {
-    pub fn new(name: &str, cmd: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            cmd: cmd.to_string(),
-        }
-    }
-}
-
-pub enum ActiveWin {
-    None,
-    Properties(ActiveWinProperties),
-}
-
 pub struct ActiveWinTracker<'a> {
     x11_helper: &'a X11Helper,
     root: Window,
