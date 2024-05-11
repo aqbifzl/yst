@@ -8,13 +8,14 @@ use std::{
 use shared::config::{ACTIVITY_SAMPLING_RATE_MS, SAVE_INTERVAL_MS};
 
 use crate::{
-    active_window::ActiveWinProperties,
+    active_window::ActiveWindow,
+    // active_window::ActiveWinProperties,
     storage::Storage,
     utils::logger::{log_msg, LogLevel},
 };
 
 pub fn watcher_main_loop(
-    active_win: Arc<Mutex<ActiveWinProperties>>,
+    active_win: &mut ActiveWindow,
     storage: Arc<Mutex<Storage>>,
     is_afk: Arc<Mutex<bool>>,
 ) {
@@ -36,7 +37,15 @@ pub fn watcher_main_loop(
             continue;
         }
 
-        let props = *active_win.lock().unwrap();
+        active_win.get();
+        let name = match &active_win.name {
+            Some(name) => name,
+            None => "unknown",
+        };
+        let cmd = match &active_win.name {
+            Some(name) => name,
+            None => "unknown",
+        };
 
         sleep(time_to_wait);
         total_passed += time_to_wait;
@@ -48,7 +57,7 @@ pub fn watcher_main_loop(
             .unwrap()
             .data
             .titles
-            .entry(props.name)
+            .entry(name.to_string())
             .and_modify(|e| *e += time_to_wait_ms)
             .or_insert(time_to_wait_ms);
         storage
@@ -56,7 +65,7 @@ pub fn watcher_main_loop(
             .unwrap()
             .data
             .applications
-            .entry(props.cmd)
+            .entry(cmd.to_string())
             .and_modify(|e| *e += time_to_wait_ms)
             .or_insert(time_to_wait_ms);
 

@@ -46,11 +46,9 @@ fn select_xi_events(conn: &RustConnection, win: Window) -> Result<(), Box<dyn Er
 pub fn idle_loop_x11(
     is_afk: Arc<Mutex<bool>>,
     connection: Arc<Mutex<RustConnection>>,
+    root: u32,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let (connection, screen_num) = connect(None)?;
-
-    let screen = &connection.setup().roots[screen_num];
-    select_xi_events(&connection, screen.root)?;
+    select_xi_events(&connection.lock().unwrap(), root)?;
 
     log_msg("Running loop monitoring inactivity", LogLevel::Debug);
     let afk_duration = Arc::new(Mutex::new(Duration::default()));
@@ -86,8 +84,8 @@ pub fn idle_loop_x11(
         sleep(Duration::from_secs(1));
         *counter.lock().unwrap() += Duration::from_secs(1);
 
-        if *counter.lock().unwrap() > MAX_IDLE_SECONDS {
-            *is_afk_for_counter.lock() = true;
+        if *counter.lock().unwrap() > Duration::from_secs(MAX_IDLE_SECONDS.into()) {
+            *is_afk_for_counter.lock().unwrap() = true;
         }
     });
 

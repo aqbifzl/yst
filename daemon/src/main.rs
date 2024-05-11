@@ -1,12 +1,13 @@
 use std::{
     process::exit,
     sync::{Arc, Mutex},
+    thread::spawn,
 };
 
 use daemon::{
-    active_window::ActiveWinProperties,
+    api::run_api,
     storage::Storage,
-    utils::logger::{init_logger, log},
+    utils::logger::{init_logger, log, log_msg, LogLevel},
     watcher::watcher_main_loop,
     wayland_watcher::handle_wayland,
     x11_watcher::handle_x11,
@@ -19,12 +20,12 @@ fn main() {
     }
     log("Starting yst");
 
-    let active_win = Arc::new(Mutex::new(ActiveWinProperties::new()));
+    // let active_win = Arc::new(Mutex::new(ActiveWinProperties::new()));
     let is_afk = Arc::new(Mutex::new(false));
     let storage = Arc::new(Mutex::new(Storage::new()));
 
     #[cfg(feature = "x11")]
-    handle_x11(active_win.clone(), is_afk.clone());
+    let mut active_win = handle_x11(is_afk.clone());
 
     #[cfg(feature = "wayland")]
     handle_wayland();
@@ -40,5 +41,5 @@ fn main() {
         }
     });
 
-    watcher_main_loop(active_win, storage, is_afk);
+    watcher_main_loop(&mut active_win, storage, is_afk);
 }
