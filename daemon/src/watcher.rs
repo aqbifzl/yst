@@ -9,7 +9,6 @@ use shared::config::{ACTIVITY_SAMPLING_RATE_MS, SAVE_INTERVAL_MS};
 
 use crate::{
     active_window::ActiveWindow,
-    // active_window::ActiveWinProperties,
     storage::Storage,
     utils::logger::{log_msg, LogLevel},
 };
@@ -32,20 +31,18 @@ pub fn watcher_main_loop(
     let mut total_passed = Duration::default();
 
     loop {
-        let is_afk = *is_afk.lock().unwrap();
-        if is_afk {
+        if *is_afk.lock().unwrap() {
             continue;
         }
 
         active_win.get();
-        let name = match &active_win.name {
-            Some(name) => name,
-            None => "unknown",
-        };
-        let cmd = match &active_win.name {
-            Some(name) => name,
-            None => "unknown",
-        };
+        let default_value = || "unknown".to_string();
+
+        let (name, cmd) = (active_win.name.as_ref(), active_win.cmd.as_ref());
+        let (name, cmd) = (
+            name.map_or_else(default_value, |c| c.to_string()),
+            cmd.map_or_else(default_value, |c| c.to_string()),
+        );
 
         sleep(time_to_wait);
         total_passed += time_to_wait;
@@ -57,15 +54,16 @@ pub fn watcher_main_loop(
             .unwrap()
             .data
             .titles
-            .entry(name.to_string())
+            .entry(name)
             .and_modify(|e| *e += time_to_wait_ms)
             .or_insert(time_to_wait_ms);
+
         storage
             .lock()
             .unwrap()
             .data
             .applications
-            .entry(cmd.to_string())
+            .entry(cmd)
             .and_modify(|e| *e += time_to_wait_ms)
             .or_insert(time_to_wait_ms);
 

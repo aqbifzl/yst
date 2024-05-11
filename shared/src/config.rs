@@ -6,4 +6,4 @@ pub const LOG_SEPARATOR: &str = "|";
 pub const API_HOST: &str = "127.0.0.1:3000";
 pub const SAVE_INTERVAL_MS: u128 = 3000;
 pub const ACTIVITY_SAMPLING_RATE_MS: u8 = 100;
-pub const MAX_IDLE_SECONDS: u8 = 30;
+pub const MAX_IDLE_SECONDS: u8 = 3;

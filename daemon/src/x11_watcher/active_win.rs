@@ -2,9 +2,8 @@ use crate::utils::process::get_name_by_pid;
 
 use super::x11helper::X11Helper;
 
-pub fn get_active_window_x11(x11_helper: &X11Helper, root: u32) -> Option<(String, String)> {
-    let active_window =
-        x11_helper.get_window_id_from_atom(root, x11_helper.atoms._net_active_window);
+pub fn get_active_window_x11(x11_helper: &X11Helper) -> Option<(String, String)> {
+    let active_window = x11_helper.get_root_window_id(x11_helper.atoms._net_active_window);
 
     if let Some(active_window) = active_window {
         let wm_name = x11_helper.get_window_wm_name(active_window); // alternative to net_name

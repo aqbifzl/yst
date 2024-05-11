@@ -4,12 +4,13 @@ use std::{
     thread::spawn,
 };
 
+#[cfg(feature = "wayland")]
+use daemon::wayland_watcher::handle_wayland;
 use daemon::{
     api::run_api,
     storage::Storage,
     utils::logger::{init_logger, log, log_msg, LogLevel},
     watcher::watcher_main_loop,
-    wayland_watcher::handle_wayland,
     x11_watcher::handle_x11,
 };
 
@@ -20,7 +21,6 @@ fn main() {
     }
     log("Starting yst");
 
-    // let active_win = Arc::new(Mutex::new(ActiveWinProperties::new()));
     let is_afk = Arc::new(Mutex::new(false));
     let storage = Arc::new(Mutex::new(Storage::new()));
 
