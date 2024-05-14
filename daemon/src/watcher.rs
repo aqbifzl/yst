@@ -11,7 +11,7 @@ use crate::{
     active_window::ActiveWindow,
     storage::Storage,
     utils::logger::{log_msg, LogLevel},
-    wayland_watcher::toplevel_handler::get_current_name_and_cmd,
+    wayland_watcher::{idle_handler::get_idle_state, toplevel_handler::get_current_name_and_cmd},
 };
 
 pub fn watcher_main_loop(
@@ -32,6 +32,12 @@ pub fn watcher_main_loop(
     let mut total_passed = Duration::default();
 
     loop {
+        #[cfg(feature = "wayland")]
+        {
+            let new_state = get_idle_state();
+            *is_afk.lock().unwrap() = new_state;
+        }
+
         if *is_afk.lock().unwrap() {
             continue;
         }
