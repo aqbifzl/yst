@@ -11,6 +11,7 @@ use crate::{
     active_window::ActiveWindow,
     storage::Storage,
     utils::logger::{log_msg, LogLevel},
+    wayland_watcher::toplevel_handler::get_current_name_and_cmd,
 };
 
 pub fn watcher_main_loop(
@@ -35,6 +36,17 @@ pub fn watcher_main_loop(
             continue;
         }
 
+        #[cfg(feature = "wayland")]
+        {
+            let (new_name, new_cmd) = get_current_name_and_cmd();
+            if new_cmd.is_none() || new_name.is_none() {
+                continue;
+            }
+            active_win.name = new_name;
+            active_win.cmd = new_cmd;
+        }
+
+        #[cfg(feature = "x11")]
         active_win.get();
         let default_value = || "unknown".to_string();
 

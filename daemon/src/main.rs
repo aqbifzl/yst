@@ -4,15 +4,18 @@ use std::{
     thread::spawn,
 };
 
-#[cfg(feature = "wayland")]
-use daemon::wayland_watcher::handle_wayland;
 use daemon::{
+    active_window::ActiveWindow,
     api::run_api,
     storage::Storage,
     utils::logger::{init_logger, log, log_msg, LogLevel},
     watcher::watcher_main_loop,
-    x11_watcher::handle_x11,
 };
+
+#[cfg(feature = "wayland")]
+use daemon::wayland_watcher::handle_wayland;
+#[cfg(feature = "x11")]
+use daemon::{watcher::watcher_main_loop, x11_watcher::handle_x11};
 
 fn main() {
     if let Err(err) = init_logger() {
@@ -27,6 +30,8 @@ fn main() {
     #[cfg(feature = "x11")]
     let mut active_win = handle_x11(is_afk.clone());
 
+    #[cfg(feature = "wayland")]
+    let mut active_win = ActiveWindow::default(); // dummy
     #[cfg(feature = "wayland")]
     handle_wayland();
 

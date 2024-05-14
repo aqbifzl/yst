@@ -1,8 +1,9 @@
+#[cfg(feature = "x11")]
 use crate::x11_watcher::x11helper::X11Helper;
 
 pub struct ActiveWindow {
     #[cfg(feature = "x11")]
-    pub x11_helper: X11Helper,
+    pub x11_helper: Option<X11Helper>,
 
     pub name: Option<String>,
     pub cmd: Option<String>,
@@ -10,11 +11,23 @@ pub struct ActiveWindow {
 
 impl Default for ActiveWindow {
     fn default() -> Self {
-        Self::new()
+        #[cfg(feature = "wayland")]
+        return Self::new_wayland();
+        #[cfg(not(feature = "wayland"))]
+        return Self::new();
     }
 }
 
 impl ActiveWindow {
+    #[cfg(feature = "wayland")]
+    fn new_wayland() -> Self {
+        Self {
+            name: None,
+            cmd: None,
+            #[cfg(feature = "x11")]
+            x11_helper: None,
+        }
+    }
     #[cfg(feature = "x11")]
     pub fn new() -> Self {
         use std::process::exit;
