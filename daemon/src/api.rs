@@ -3,16 +3,21 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use axum::{routing, Router};
-use shared::config::API_HOST;
+use axum::{
+    http::{HeaderValue, Method},
+    routing, Router,
+};
+use shared::config::{API_HOST, CLIENT_URI};
 
 use crate::{
     storage::Storage,
     utils::logger::{log_msg, LogLevel},
 };
+use tower_http::cors::CorsLayer;
 
-use self::{ping::ping, today::today};
+use self::{day::day, ping::ping, today::today};
 
+mod day;
 mod ping;
 mod today;
 
@@ -20,9 +25,16 @@ mod today;
 pub async fn run_api(
     screen_time_watcher: Arc<Mutex<Storage>>,
 ) -> Result<(), Box<dyn error::Error>> {
+    let cors = CorsLayer::new()
+        .allow_methods([Method::GET])
+        .allow_origin(CLIENT_URI.parse::<HeaderValue>().unwrap());
+
+    let today_screen_watcher = screen_time_watcher.clone();
     let app = Router::new()
         .route("/ping", routing::get(ping))
-        .route("/today", routing::get(|| today(screen_time_watcher)));
+        .route("/today", routing::get(|| today(today_screen_watcher)))
+        .route("/day", routing::get(day))
+        .layer(cors.clone());
 
     let listener = match tokio::net::TcpListener::bind(API_HOST).await {
         Ok(listener) => listener,

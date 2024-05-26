@@ -5,7 +5,7 @@ edition = "2021"
 
 [features]
 default=["api", "wayland"]
-api=["dep:axum", "dep:tokio"]
+api=["dep:axum", "dep:tokio", "dep:tower-http"]
 x11=["dep:x11rb"]
 wayland=["dep:wayland-sys", "dep:wayland-client", "dep:wayland-commons", "dep:wayland-scanner"]
 
@@ -24,3 +24,4 @@ wayland-client = {version="0.31.2", optional = true}
 wayland-commons = {version="0.29.5", optional = true}
 wayland-scanner = {version="0.31.1", optional = true}
 wayland-backend = "0.3.3"
+tower-http = {version = "0.5.2", features = ["cors"], optional = true}
